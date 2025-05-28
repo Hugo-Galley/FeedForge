@@ -1,0 +1,11 @@
+{
+  "Log" : {
+    "FileDestination" : "log/backend.log"
+  },
+  "Bdd" : {
+    "Host" : "",
+    "User" : "",
+    "Database": "",
+    "Port": 3036
+  }
+}

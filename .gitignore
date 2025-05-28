@@ -1,0 +1,47 @@
+# Node/Vite/React
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+.vite/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+
+# Python/PyCharm
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv/
+venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.mypy_cache/
+.pytest_cache/
+.coverage
+.tox/
+.pyre/
+.pytype/
+.idea/
+*.sqlite3
+*.db
+
+# OS
+Thumbs.db
+.DS_Store
