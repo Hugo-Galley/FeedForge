@@ -1,0 +1,65 @@
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environnements virtuels
+env/
+venv/
+ENV/
+.venv/
+.pip/
+pip-wheel-metadata/
+
+# Fichiers de logs
+*.log
+
+# Fichiers de base de données
+*.sqlite3
+*.db
+
+# Configuration de l’éditeur PyCharm
+.idea/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers de tests
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+
+# Outils de packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Fichiers de cache
+.cache/
+*.bak
+
+# Autres fichiers temporaires
+*.swp
+*.swo
+*.~
+
+# Notebooks Jupyter
+.ipynb_checkpoints/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Pylint
+.pylint.d/
+
+# Pyright
+pyrightconfig.json
