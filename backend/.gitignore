@@ -65,3 +65,5 @@ dmypy.json
 pyrightconfig.json
 
 variables.json
+test.py
+/test.py

@@ -11,7 +11,7 @@ CREATE TABLE Users (
 )
 -- une table pour stocker les flux RSS avec les infos (scrapper le site de flux dis dans notion)
 CREATE TABLE RssFlowLibrary(
-    rssFlowLibraryId NOT NULL CHAR(36) PRIMARY KEY
+    rssFlowLibraryId NOT NULL CHAR(36) PRIMARY KEY,
     flowName NOT NULL VARCHAR(255),
     flowLink NOT NULL TEXT,
     category NOT NULL VARCHAR(255),
