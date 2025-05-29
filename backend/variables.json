@@ -3,9 +3,10 @@
     "FileDestination" : "log/backend.log"
   },
   "Bdd" : {
-    "Host" : "",
-    "User" : "",
-    "Database": "",
-    "Port": 3036
+    "Host" : "localhost",
+    "User" : "root",
+    "Password" : "root",
+    "Database": "FeedForge",
+    "Port": 8889
   }
 }
