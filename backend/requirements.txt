@@ -1,4 +1,4 @@
-EasyWorkEnv>=0.3.1
+EasyWorkEnv>=0.3.3
 requests
 colorlog
 langdetect
@@ -6,3 +6,4 @@ sqlalchemy
 uvicorn
 fastapi
 pymysql
+beautifulsoup4
