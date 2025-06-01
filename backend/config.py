@@ -11,7 +11,6 @@ config = Config("variables.json")
 
 
 def configBdd():
-    # Première connexion sans spécifier la base de données pour la créer
     connection = pymysql.connect(
         host=config.Bdd.Host,
         user=config.Bdd.User,
@@ -21,21 +20,17 @@ def configBdd():
     )
     
     with connection.cursor() as cursor:
-        # Correction de la syntaxe SQL - ajout des backticks manquants
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{config.Bdd.Database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
-        connection.commit()  # Important : commit la création de la base
+        connection.commit()  
     
     connection.close()
 
-    # Maintenant que la base de données existe, on peut se connecter avec SQLAlchemy
     engine = create_engine(
         f"mysql+pymysql://{config.Bdd.User}:{config.Bdd.Password}@{config.Bdd.Host}:{config.Bdd.Port}/{config.Bdd.Database}?charset=utf8mb4"
     )
     
-    # Créer toutes les tables
     Base.metadata.create_all(bind=engine)
     
-    # Créer la session
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     db = SessionLocal()
     return db

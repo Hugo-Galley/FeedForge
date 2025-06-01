@@ -1,27 +1,32 @@
 import uuid
-
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from config import db
 from models import CustomRssFlow, RssFlowLibrary
 from langdetect import detect
+
+def findFilter(listOfFiler,flowId):
+    for filter in listOfFiler:
+        if filter["FlowId"] == flowId:
+            return filter
 def recupInfoFromRssFlow(url):
 
     listOfArticle = []
     response = requests.get(url)
     root = ET.fromstring(response.text)
     channel = root.find("channel")
+    rssFlowLibraryId = db.query(RssFlowLibrary).filter(RssFlowLibrary.flowLink == url).first().rssFlowLibraryId
     if channel is not None:
         for item in channel.findall("item"):
             article = {}
             article["title"] = item.find("title").text
-            dt = datetime.strptime(item.find("pubDate").text, "%a, %d %b %Y %H:%M:%S %Z")
-            article["publicationDate"] = dt.isoformat()
+            #dt = datetime.strptime(item.find("pubDate").text, "%a, %d %b %Y %H:%M:%S %z")
+            article["publicationDate"] = item.find("pubDate").text
             article["link"] = item.find("link").text
             article["description"] = item.find("description").text
             article["language"] = detect(article["description"])
-            article["rssFlowLibraryId"] = db.query(RssFlowLibrary).filter(RssFlowLibrary.flowLink == url).first()
+            article["rssFlowLibraryId"] = rssFlowLibraryId
             listOfArticle.append(article)
     return listOfArticle
 
@@ -34,6 +39,7 @@ def recupInfoFromYoutubeRssFlow(channelId):
     }
     response = requests.get(f"https://www.youtube.com/feeds/videos.xml?channel_id={channelId}")
     root = ET.fromstring(response.text)
+    rssFlowLibrairyId = db.query(RssFlowLibrary).filter(RssFlowLibrary.flowLink.contains("https://youtube.com")).first()
     for entry in root.findall("atom:entry",namespaces):
         video = {}
         video["title"] = entry.find("atom:title", namespaces).text
@@ -45,32 +51,56 @@ def recupInfoFromYoutubeRssFlow(channelId):
             video["description"] = "No description is available"
         video["publicationDate"] = entry.find("atom:published", namespaces).text
         video["language"] = detect(video["title"])
-        video["rssFlowLibraryId"] = db.query(RssFlowLibrary).filter(RssFlowLibrary.flowLink == "https://youtube.com").first()
+        video["rssFlowLibraryId"] = rssFlowLibrairyId
         listOfVideos.append(video)
     return listOfVideos
 
-def CreatePersonalisateFlow(listOfSelectionnedFlow,userId):
+def CreatePersonalisateFlow(listOfSelectionnedFlow,userId,lisOfFilter):
     for flow in listOfSelectionnedFlow:
+        filter = findFilter(lisOfFilter, flow["FlowId"])
         match flow["tag"] :
             case "Classic":
                 data = recupInfoFromRssFlow(flow["link"])
+                sortData = filterRssFlow(filter,data)
             case "Youtube" :
                 data = recupInfoFromYoutubeRssFlow(flow["link"])
-        for item in data:
-            newItem = CustomRssFlow(
-                customRssFlowId = uuid.uuid4(),
-                articleTitle = item["title"],
-                articlePublicationDate = item["publicationDate"],
-                articleLink = item["link"],
-                articleDescription = item["description"],
-                articleLanguage = item["language"],
-                rssFlowLibraryId = item["rssFlowLibraryId"],
-                userId = userId
-            )
-            db.add(newItem)
-            db.commit()
-            db.refresh(newItem)
+                sortData = filterRssFlow(filter,data)
+        for item in sortData:
+            existingItem = db.query(CustomRssFlow).filter(
+                CustomRssFlow.articleLink == item["link"],
+                CustomRssFlow.userId == userId
+            ).first()
+            if existingItem is None:
+                newItem = CustomRssFlow(
+                    customRssFlowId = uuid.uuid4(),
+                    articleTitle = item["title"],
+                    articlePublicationDate = item["publicationDate"],
+                    articleLink = item["link"],
+                    articleDescription = item["description"],
+                    articleLanguage = item["language"],
+                    rssFlowLibraryId = item["rssFlowLibraryId"],
+                    userId = userId
+                )
+                db.add(newItem)
+        db.commit()
 
+def filterRssFlow(filter,listOfSelectionnedarticle):
+    finalListOfArticle = []
+    for article in listOfSelectionnedarticle:
+        shouldInclude = False
+        if filter["keywords"] != "Nothing":
+            listOfKeyword = filter["keywords"].split(";")
+            for keyword in listOfKeyword:
+                if keyword.lower() in article["title"].lower() or keyword.lower() in article["description"].lower():
+                    shouldInclude = True
+                    break
+        else:
+            shouldInclude = True
+        if shouldInclude:
+            if filter["language"] != "Nothing":
+                if article["language"] == filter["language"]:
+                    finalListOfArticle.append(article)
+            else :
+                finalListOfArticle.append(article)
 
-
-
+    return finalListOfArticle
