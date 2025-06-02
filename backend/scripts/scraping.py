@@ -7,8 +7,20 @@ import xml.etree.ElementTree as ET
 from config import db
 from models import RssFlowLibrary
 
+def isXml(rssLink):
+    try:
+        response = requests.get(rssLink)
+        response.raise_for_status()
+        fileContent = response.text
+        ET.fromstring(fileContent)
+        return True
+    except (ET.ParseError, requests.RequestException, Exception):
+        return False
+
 def scrappRssFlow(xmlFileurl,category):
     atlasRssUrl = f"https://atlasflux.saynete.net/{xmlFileurl}"
+    if not isXml(atlasRssUrl):
+        return False
     response = requests.get(atlasRssUrl)
     if response.status_code == 200:
         root = ET.fromstring(response.text)
@@ -46,3 +58,9 @@ startTime = time.time()
 scrapRssCategory()
 endTime = time.time()
 print(f"Il aura fallu : {endTime - startTime} secondes")
+
+"""
+Il faut faire une verification que les liens recuperé contienne bien du xml 
+on Teste le lien xml si le contenu recupré retourne True, alors c'est parsable 
+"""
+

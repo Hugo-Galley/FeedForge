@@ -1,7 +1,6 @@
 import uuid
 import requests
 import xml.etree.ElementTree as ET
-from datetime import datetime
 from config import db
 from models import CustomRssFlow, RssFlowLibrary
 from langdetect import detect
@@ -104,3 +103,4 @@ def filterRssFlow(filter,listOfSelectionnedarticle):
                 finalListOfArticle.append(article)
 
     return finalListOfArticle
+
