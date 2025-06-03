@@ -1,0 +1,139 @@
+.container-form{
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    color: white;
+    height: 100vh;
+    justify-content: space-evenly;
+
+}
+.alternative-connexion{
+    display: flex;
+    flex-direction: row;
+    color: white;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 20px;
+    margin: 20px 0;
+}
+.registerForm{
+    display: flex;
+    flex-direction: column;
+    width: 40vw;
+    align-items: center;
+    color: white;
+    margin-top: -5vh;
+}
+input{
+    width: 20vw;
+    height: 3.5vh;
+    border-radius: 10px;
+    border: 0;
+    background-color: rgb(68, 68, 68);
+    color: white;
+    padding: 10px;
+}
+input::placeholder{
+    color: white;
+}
+label{
+    width: 20vw;
+    display: flex;
+    margin: 30px 0 10px 0px;
+}
+.head-description{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+.head-description >p {
+    color: rgb(197, 197, 197);
+    margin-top: -2px;
+    width: 15vw;
+}
+.signinButton{
+    width: 21vw;
+    height: 4vh;
+    margin: 20px;
+    border-radius: 10px;
+    border: 0;
+    background-color: white;
+    margin: 4vh;
+}
+.signinZone{
+    margin-top: -5vh;
+}
+.separator {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    width: 20vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.line {
+    flex: 1;
+    height: 1px;
+    background-color: rgb(197, 197, 197);;
+}
+
+.separator span {
+    padding: 0 15px;
+    color: rgb(197, 197, 197);
+    font-size: 0.9em;
+}
+
+.SignInWithGoogle, .SignInWithApple {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15vw;
+    height: 50px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background-color: #2a2a2a;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.SignInWithGoogle:hover, .SignInWithApple:hover {
+    background-color: #3a3a3a;
+    border-color: #666;
+}
+
+.SignInWithGoogle {
+    background-color: #4285f4;
+    border-color: #4285f4;
+}
+
+.SignInWithGoogle:hover {
+    background-color: #357ae8;
+}
+
+.SignInWithApple {
+    background-color: #000000;
+    border-color: #333;
+}
+
+.SignInWithApple:hover {
+    background-color: #1a1a1a;
+}
+.switch-button {
+  background: none;
+  border: none;
+  color: #ababab;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: -7vh;
+}
+
+.switch-button:hover {
+  text-decoration: underline;
+}
