@@ -7,3 +7,4 @@ uvicorn
 fastapi
 pymysql
 beautifulsoup4
+python-dateutil

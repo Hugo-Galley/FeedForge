@@ -59,8 +59,3 @@ scrapRssCategory()
 endTime = time.time()
 print(f"Il aura fallu : {endTime - startTime} secondes")
 
-"""
-Il faut faire une verification que les liens recuperé contienne bien du xml 
-on Teste le lien xml si le contenu recupré retourne True, alors c'est parsable 
-"""
-

@@ -4,11 +4,20 @@ import xml.etree.ElementTree as ET
 from config import db
 from models import CustomRssFlow, RssFlowLibrary
 from langdetect import detect
+from dateutil import parser
 
 def findFilter(listOfFiler,flowId):
     for filter in listOfFiler:
         if filter["FlowId"] == flowId:
             return filter
+
+def parse_iso_date(date_str):
+    try:
+        dt = parser.isoparse(date_str)
+    except Exception:
+        dt = parser.parse(date_str)
+    return dt.isoformat()
+
 def recupInfoFromRssFlow(url):
 
     listOfArticle = []
@@ -20,8 +29,7 @@ def recupInfoFromRssFlow(url):
         for item in channel.findall("item"):
             article = {}
             article["title"] = item.find("title").text
-            #dt = datetime.strptime(item.find("pubDate").text, "%a, %d %b %Y %H:%M:%S %z")
-            article["publicationDate"] = item.find("pubDate").text
+            article["publicationDate"] = parse_iso_date(item.find("pubDate").text)
             article["link"] = item.find("link").text
             article["description"] = item.find("description").text
             article["language"] = detect(article["description"])
@@ -48,7 +56,7 @@ def recupInfoFromYoutubeRssFlow(channelId):
             video["description"] = video["description"].text
         else:
             video["description"] = "No description is available"
-        video["publicationDate"] = entry.find("atom:published", namespaces).text
+        video["publicationDate"] = parse_iso_date(entry.find("atom:published", namespaces).text)
         video["language"] = detect(video["title"])
         video["rssFlowLibraryId"] = rssFlowLibrairyId
         listOfVideos.append(video)
@@ -81,6 +89,7 @@ def CreatePersonalisateFlow(listOfSelectionnedFlow,userId,lisOfFilter):
                     userId = userId
                 )
                 db.add(newItem)
+
         db.commit()
 
 def filterRssFlow(filter,listOfSelectionnedarticle):
