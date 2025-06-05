@@ -7,8 +7,9 @@ body {
   margin: 0;
   padding: 0;
   overflow-y: hidden;
-  background-color: black;
+  background-color: rgb(12, 11, 11);
   color: white;
+  font-family: "Geist";
 }
 
 
