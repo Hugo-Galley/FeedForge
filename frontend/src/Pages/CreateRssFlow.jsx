@@ -1,84 +1,14 @@
 import { useEffect, useState } from 'react';
 import '../styles/CreatRssFlowPage.css'
-import { PlusOutlined, DownOutlined,CloseOutlined } from '@ant-design/icons';
-import { Dropdown, Space, Typography, Checkbox, Input, Tag, Flex } from 'antd';
+import { PlusOutlined,CloseOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import {Badge , Space, Select, Input, Tag, Button } from 'antd';
 
 export default function CreateRssFlow(){
-    const [selectedLanguages,setSelectedLanguages] = useState(["1"])
-    const [selectedCategory,setSelectedCategories] = useState(["1"])
     const [selectedFlow,setSelectedFlow] = useState([])
     const [initialFlow,setInitialFlow] = useState([])
-
-    const langues = [
-        {
-            key: "Français",
-            label: (
-                <Checkbox
-                    checked={selectedLanguages.includes('Français')}
-                    onChange={(e) => handleFilterChange('Français', e.target.checked, "langues")}
-                >
-                    Français
-                </Checkbox>
-            )
-        },
-        {
-            key: "Anglais",
-            label: (
-                <Checkbox
-                    checked={selectedLanguages.includes('Anglais')}
-                    onChange={(e) => handleFilterChange('Anglais', e.target.checked, "langues")}
-                >
-                    Anglais
-                </Checkbox>
-            )
-        },
-        {
-            key: "Espagnol",
-            label: (
-                <Checkbox
-                    checked={selectedLanguages.includes('Espagnol')}
-                    onChange={(e) => handleFilterChange('Espagnol', e.target.checked, "langues")}
-                >
-                    Espagnol
-                </Checkbox>
-            )
-        }
-    ];
-    const category = [
-        {
-            key: "Presse",
-            label: (
-                <Checkbox
-                    checked={selectedCategory.includes('Presse')}
-                    onChange={(e) => handleFilterChange('Presse', e.target.checked, "categorys")}
-                >
-                    Presse
-                </Checkbox>
-            )
-        },
-        {
-            key: "Youtube",
-            label: (
-                <Checkbox
-                    checked={selectedCategory.includes('Youtube')}
-                    onChange={(e) => handleFilterChange('Youtube', e.target.checked, "categorys")}
-                >
-                    Youtube
-                </Checkbox>
-            )
-        },
-        {
-            key: "Medium",
-            label: (
-                <Checkbox
-                    checked={selectedCategory.includes('Medium')}
-                    onChange={(e) => handleFilterChange('Medium', e.target.checked, "categorys")}
-                >
-                    Medium
-                </Checkbox>
-            )
-        }
-    ];
+    const [FilterinitialFlow,setFiltrerInitialFlow] = useState([])
+    const [selectedLanguages, setSelectedLanguages] = useState(['Français'])
+    const [selectedCategories, setSelectedCategories] = useState(['Presse'])
 
     const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "geekblue", "purple"];
     
@@ -161,113 +91,183 @@ export default function CreateRssFlow(){
             "category": "Youtube"
         }
     ]
-    function handleFilterChange(key, checked, type){
-        if (checked){
-            if (type === "langues"){
-                setSelectedLanguages([...selectedLanguages, key])
-            }
-            else{
-                setSelectedCategories([...selectedCategory, key])
-            }
-            
-        }
-        else{
-            if (type === "langues"){
-                setSelectedLanguages(selectedLanguages.filter(lang => lang !== key))
-            }
-            else{
-                setSelectedCategories(selectedCategory.filter(cat => cat !== key))
-            }
 
+    const options = [
+      {
+        label: 'Français',
+        value: 'Français',
+        emoji: '🇫🇷',
+        desc: 'Français',
+      },
+      {
+        label: 'Anglais',
+        value: 'Anglais',
+        emoji: '🇬🇧',
+        desc: 'Anglais (English)',
+      },
+      {
+        label: 'Espagnol',
+        value: 'Espagnol',
+        emoji: '🇪🇸',
+        desc: 'Espagnol (Español)',
+      },
+      {
+        label: 'Chinois',
+        value: 'Chinois',
+        emoji: '🇨🇳',
+        desc: 'Chinois (中文)',
+      },
+    ];
+    const categoryOptions = [
+        {
+            label: 'Presse',
+            value: 'Presse',
+            emoji: '📰',
+            desc: 'Presse (Journaux, Magazines, etc.)',
+        },
+        {
+            label: 'Youtube',
+            value: 'Youtube',
+            emoji: '📺',
+            desc: 'Youtube (Chaînes vidéo)',
+        },
+        {
+            label: 'Medium',
+            value: 'Medium',
+            emoji: '✍️',
+            desc: 'Medium (Blogs, Articles)',
+        },
+    ];
+    function applyFilters(){
+        let filterFlows = initialFlow;
+
+        if (selectedLanguages.length > 0){
+            filterFlows = filterFlows.filter(f => selectedLanguages.includes(f.language))
         }
+        if (selectedCategories.length > 0){
+            filterFlows = filterFlows.filter(f => selectedCategories.includes(f.category))
+        }
+        filterFlows = filterFlows.filter(f => !selectedFlow.some(selected => selected.name === f.name))
+
+        setFiltrerInitialFlow(filterFlows)
     }
 
     function moveFlow(flow, type) {
         if (type === "add") {
             if (!selectedFlow.some(f => f.name === flow.name)) {
                 setSelectedFlow([...selectedFlow, flow]);
-                setInitialFlow(initialFlow.filter(f => f.name !== flow.name));
+                setTimeout(() => applyFilters(), 0);
             }
         } else {
-            setInitialFlow([...initialFlow, flow]);
-            setSelectedFlow(selectedFlow.filter(f => f.name !== flow.name));
+            setSelectedFlow(selectedFlow.filter(f => f.name !== flow.name))
+            setTimeout(() => applyFilters(), 0);
         }
     }
 
-    function filterFlow({key}){
-        setInitialFlow(initialFlow.filter(f => f.language === key))
-    }
-        
+    useEffect(() =>{
+        if (initialFlow.length > 0) {
+            applyFilters()
+        }
+    })
+
     useEffect(()=>{
         setInitialFlow(tags)
+        setFiltrerInitialFlow(tags)
     },[])
+
+        function filterFlowByLanguage(languageList) {
+        setSelectedLanguages(languageList);
+    }
+    
+    function filterFlowByCategory(categoryList) {
+        setSelectedCategories(categoryList);
+    }
+
     return(
         <div>
-            <div className="header">
-                <h2 className="yourName">Freaks</h2>
-                <p className="description">Création de votre Flow personalisé</p>
-            </div>
-            <div className="searchBar-container">
-                <Input placeholder="input search text" variant='borderless' className="searchBar"/>
-                <div className='language-filter'>
-                    <Dropdown
-                    menu={{
-                        items : langues,
-                        onClick: filterFlow
-                    }}
-                    trigger={['click']}
-                    
-                    >
-                        <Typography.Link className="custom-dropdown-link">
-                            <Space>
-                            Langues
-                                <DownOutlined/>
-                            </Space>
-                        </Typography.Link>
-                    </Dropdown>
+            <div className='main-div'>
+                <div className="header">
+                    <h2 className="yourName">Freaks</h2>
+                    <p className="description">Création de votre Flow personalisé</p>
                 </div>
-
-                <div className='category-filter'>
-                    <Dropdown
-                    menu={{items : category}}
-                    trigger={['click']}
-                    >
-                        <Typography.Link className="custom-dropdown-link">
+                <div className="searchBar-container">
+                    <Input placeholder="input search text" variant='borderless' className="searchBar"/>
+                    <div className='language-filter'>
+                        <Select
+                        mode='multiple'
+                        style={{width:'100%'}}
+                        placeholder="Langues"
+                        defaultValue={['Français']}
+                        onChange={filterFlowByLanguage}
+                        options={options}
+                        optionRender={(option) => (
                             <Space>
-                            Categories
-                                <DownOutlined/>
+                                <span role='img' aria-label={option.data.label}>
+                                    {option.data.emoji}
+                                </span>
+                                {option.data.desc}
                             </Space>
-                        </Typography.Link>
-                    </Dropdown>
+                        )}
+                        />
+                    </div>
+
+                    <div className='category-filter'>
+                    <Select
+                        mode='multiple'
+                        style={{width:'100%'}}
+                        placeholder="Categories"
+                        defaultValue={['Presse']}
+                        onChange={filterFlowByCategory}
+                        options={categoryOptions}
+                        optionRender={(option) => (
+                            <Space>
+                                <span role='img' aria-label={option.data.label}>
+                                    {option.data.emoji}
+                                </span>
+                                {option.data.desc}
+                            </Space>
+                        )}
+                        />
+                    </div>
+
+
                 </div>
-
-
-            </div>
-            <h1 className='title-recommanded-rss'>RssFlow</h1>
-            <div className="recommandedRssFlow">
-                {initialFlow.map((tag,key) => (
-                    <div>
-                    <Tag key={key} color={tag.color} className='tag' onClick={() => moveFlow(tag,"add")} >
-                        <img src={tag.logoUrl} alt={tag.name} className="tag-logo"/>
-                        <span className="tag-name">{tag.name}</span>
-                        <PlusOutlined />
-                    </Tag>
-                   
+                <div className="badge-ribbon-container">
+                <Badge.Ribbon text="RssFlow">
+                    <div className="recommandedRssFlow">
+                    {FilterinitialFlow.map((tag, key) => (
+                        <div key={key}>
+                        <Tag color={tag.color} className='tag' onClick={() => moveFlow(tag,"add")} >
+                            <img src={tag.logoUrl} alt={tag.name} className="tag-logo"/>
+                            <span className="tag-name">{tag.name}</span>
+                            <PlusOutlined />
+                        </Tag>
+                        </div>
+                    ))}           
                     </div>
-                ))}                
-            </div>
-            <h1 className='title-recommanded-rss'>Vos flux selectionné</h1>
-            <div className="selectionedRssFlow">
-                {selectedFlow.map((tag,key) => (
-                    <div>
-                    <Tag key={key} color={tag.color} className='tag' onClick={() => moveFlow(tag,"remove")}>
-                        <img src={tag.logoUrl} alt={tag.name} className="tag-logo"/>
-                        <span className="tag-name">{tag.name}</span>
-                        <CloseOutlined />
-                    </Tag>
-                   
+                </Badge.Ribbon>
+                </div>
+                
+                <div className="badge-ribbon-container">
+                <Badge.Ribbon text="Vos Flows" color='pink'>
+                    <div className="recommandedRssFlow">
+                    {selectedFlow.map((tag, key) => (
+                        <div key={key}>
+                        <Tag color={tag.color} className='tag' onClick={() => moveFlow(tag,"remove")} >
+                            <img src={tag.logoUrl} alt={tag.name} className="tag-logo"/>
+                            <span className="tag-name">{tag.name}</span>
+                            <CloseOutlined />
+                        </Tag>
+                        </div>
+                    ))}           
                     </div>
-                ))}      
+                </Badge.Ribbon>
+                </div>
+            </div>
+            <div className='nextButton'>
+            <Button type="primary"  icon={<ArrowRightOutlined />} iconPosition='end' size='large' >
+                Suivant
+            </Button>
             </div>
         </div>
     )

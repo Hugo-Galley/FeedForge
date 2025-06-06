@@ -1,12 +1,12 @@
 import './styles/App.css'
-import AuthPage from './Pages/Auth.jsx'
+import NavBar from './Pages/NavBar.jsx'
 import CreateRssFlow
  from './Pages/CreateRssFlow.jsx'
 function App() {
   return (
     <div>
+      <NavBar/>
       <CreateRssFlow/>
-
     </div>
   )
 }
