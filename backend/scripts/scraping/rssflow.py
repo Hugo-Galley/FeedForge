@@ -1,12 +1,15 @@
+import logging
 import time
 import uuid
 import requests
 from bs4 import BeautifulSoup
 import re
 import xml.etree.ElementTree as ET
-from config import db
-from models import RssFlowLibrary
+from config import db, setupLog
+from configFiles.models import RssFlowLibrary
+from utility.time import getTime
 
+setupLog()
 def isXml(rssLink):
     try:
         response = requests.get(rssLink)
@@ -26,17 +29,25 @@ def scrappRssFlow(xmlFileurl,category):
         root = ET.fromstring(response.text)
         for flux in root.findall("flux"):
             domains = re.findall(r"^https?:\/\/([^\/]+)",flux.find("adresse").text)
+            testLogo  = requests.get(f"https://logo.clearbit.com/{domains[0]}")
+            logging.info(f"On test le logo pour {domains[0]}")
+            if testLogo.status_code == 200:
+                testLogo = f"https://logo.clearbit.com/{domains[0]}"
+                logging.info(f"Loogo trouvé pour {domains[0]}")
+            else:
+                testLogo = None
             newRssFlux = RssFlowLibrary(
                 rssFlowLibraryId = uuid.uuid4(),
                 flowName = flux.find("source").text,
                 flowLink = flux.find("adresse").text,
                 category = category,
                 domains = domains[0],
-                logo = f"https://logo.clearbit.com/{domains[0]}"
+                logo = testLogo
             )
             db.add(newRssFlux)
             db.commit()
             db.refresh(newRssFlux)
+            logging.info(f"On ajoute le flux pour {domains[0]}")
 def scrapRssCategory():
     url = "https://atlasflux.saynete.net"
     response = requests.get(url)
@@ -57,5 +68,5 @@ def scrapRssCategory():
 startTime = time.time()
 scrapRssCategory()
 endTime = time.time()
-print(f"Il aura fallu : {endTime - startTime} secondes")
+getTime(endTime-startTime)
 

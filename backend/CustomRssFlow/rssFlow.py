@@ -2,7 +2,7 @@ import uuid
 import requests
 import xml.etree.ElementTree as ET
 from config import db
-from models import CustomRssFlow, RssFlowLibrary
+from configFiles.models import CustomRssFlow, RssFlowLibrary
 from langdetect import detect
 from dateutil import parser
 
