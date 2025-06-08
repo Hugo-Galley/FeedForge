@@ -5,9 +5,9 @@ import os
 import colorlog
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base
+from configFiles.models import Base
 
-config = Config("variables.json")
+config = Config("../variables.json")
 
 
 def configBdd():
@@ -40,7 +40,7 @@ db = configBdd()
 
 def setupLog():
 
-    os.makedirs("log", exist_ok=True)
+    os.makedirs("../log", exist_ok=True)
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 
