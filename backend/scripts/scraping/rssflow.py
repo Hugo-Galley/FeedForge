@@ -2,71 +2,74 @@ import logging
 import time
 import uuid
 import requests
-from bs4 import BeautifulSoup
 import re
-import xml.etree.ElementTree as ET
-from config import db, setupLog
+
+from bs4 import BeautifulSoup
+import xml.etree.ElementTree as Et
+
+from config import db, setup_log
 from configFiles.models import RssFlowLibrary
-from utility.time import getTime
+from utility.time import get_time
 
-setupLog()
-def isXml(rssLink):
+setup_log()
+def is_xml(rss_link):
     try:
-        response = requests.get(rssLink)
+        response = requests.get(rss_link)
         response.raise_for_status()
-        fileContent = response.text
-        ET.fromstring(fileContent)
+        file_content = response.text
+        Et.fromstring(file_content)
         return True
-    except (ET.ParseError, requests.RequestException, Exception):
+    except (Et.ParseError, requests.RequestException, Exception):
         return False
 
-def scrappRssFlow(xmlFileurl,category):
-    atlasRssUrl = f"https://atlasflux.saynete.net/{xmlFileurl}"
-    if not isXml(atlasRssUrl):
+def scrap_rss_flow(xml_file_url,category):
+    atlas_rss_url = f"https://atlasflux.saynete.net/{xml_file_url}"
+    if not is_xml(atlas_rss_url):
         return False
-    response = requests.get(atlasRssUrl)
+    response = requests.get(atlas_rss_url)
     if response.status_code == 200:
-        root = ET.fromstring(response.text)
+        root = Et.fromstring(response.text)
         for flux in root.findall("flux"):
-            domains = re.findall(r"^https?:\/\/([^\/]+)",flux.find("adresse").text)
-            testLogo  = requests.get(f"https://logo.clearbit.com/{domains[0]}")
+            domains = re.findall(r"^https?:([^/]+)",flux.find("adresse").text)
+            test_logo  = requests.get(f"https://logo.clearbit.com/{domains[0]}")
             logging.info(f"On test le logo pour {domains[0]}")
-            if testLogo.status_code == 200:
-                testLogo = f"https://logo.clearbit.com/{domains[0]}"
+            if test_logo.status_code == 200:
+                logo = f"https://logo.clearbit.com/{domains[0]}"
                 logging.info(f"Loogo trouvé pour {domains[0]}")
             else:
-                testLogo = None
-            newRssFlux = RssFlowLibrary(
-                rssFlowLibraryId = uuid.uuid4(),
+                logo = None
+            new_rss_flux = RssFlowLibrary(
+                rssFlowLibraryId = str(uuid.uuid4()),
                 flowName = flux.find("source").text,
                 flowLink = flux.find("adresse").text,
                 category = category,
                 domains = domains[0],
-                logo = testLogo
+                logo = logo
             )
-            db.add(newRssFlux)
+            db.add(new_rss_flux)
             db.commit()
-            db.refresh(newRssFlux)
             logging.info(f"On ajoute le flux pour {domains[0]}")
-def scrapRssCategory():
+    else:
+        return logging.error(f"Code d'erreur non valide {response.status_code}")
+def scrap_rss_category():
     url = "https://atlasflux.saynete.net"
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text,"html.parser")
-        ongleTheme = soup.select_one("#onglet_theme")
+        onglet_theme = soup.select_one("#onglet_theme")
 
-        categorys = ongleTheme.find_all(
+        categorys = onglet_theme.find_all(
             lambda tag: tag.has_attr("class") and any(c in ["elem_onss", "elem_onc","elem_ongl"] for c in tag["class"])
         )
         for category in categorys:
-            categoryName = category.get_text(strip=True)
+            category_name = category.get_text(strip=True)
             onclick = category.get("onclick", "")
             match = re.search(r"'([^']+\.xml)'", onclick)
             fichier_xml = match.group(1) if match else "N/A"
-            scrappRssFlow(fichier_xml,categoryName)
+            scrap_rss_flow(fichier_xml,category_name)
 
 startTime = time.time()
-scrapRssCategory()
+scrap_rss_category()
 endTime = time.time()
-getTime(endTime-startTime)
+get_time(endTime-startTime)
 

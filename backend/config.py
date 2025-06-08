@@ -1,44 +1,46 @@
-import pymysql
-from EasyWorkEnv import Config
 import logging
 import os
+
+import pymysql
+from EasyWorkEnv import Config
 import colorlog
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from configFiles.models import Base
 
-config = Config("variables.json")
+CONFIG = Config("variables.json")
 
 
-def configBdd():
+def config_bdd():
     connection = pymysql.connect(
-        host=config.Bdd.Host,
-        user=config.Bdd.User,
-        password=config.Bdd.Password,
-        port=int(config.Bdd.Port),
+        host=CONFIG.Bdd.Host,
+        user=CONFIG.Bdd.User,
+        password=CONFIG.Bdd.Password,
+        port=int(CONFIG.Bdd.Port),
         charset="utf8mb4"
     )
     
     with connection.cursor() as cursor:
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{config.Bdd.Database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{CONFIG.Bdd.Database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
         connection.commit()  
     
     connection.close()
 
     engine = create_engine(
-        f"mysql+pymysql://{config.Bdd.User}:{config.Bdd.Password}@{config.Bdd.Host}:{config.Bdd.Port}/{config.Bdd.Database}?charset=utf8mb4"
+        f"mysql+pymysql://{CONFIG.Bdd.User}:{CONFIG.Bdd.Password}@{CONFIG.Bdd.Host}:{CONFIG.Bdd.Port}/{CONFIG.Bdd.Database}?charset=utf8mb4"
     )
     
     Base.metadata.create_all(bind=engine)
     
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = SessionLocal()
+    session_local = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = session_local()
     return db
 
 
-db = configBdd()
+db = config_bdd()
 
-def setupLog():
+def setup_log():
 
     os.makedirs("log", exist_ok=True)
     logger = logging.getLogger()
@@ -60,7 +62,7 @@ def setupLog():
         )
     )
 
-    file_handler = logging.FileHandler(config.Log.FileDestination, mode="a")
+    file_handler = logging.FileHandler(CONFIG.Log.FileDestination, mode="a")
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter(
         "%(asctime)s - %(levelname)s - %(message)s",
