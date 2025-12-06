@@ -1,0 +1,9 @@
+easyworkenv
+requests
+langdetect
+sqlalchemy
+uvicorn
+fastapi
+pymysql
+beautifulsoup4
+python-dateutil
