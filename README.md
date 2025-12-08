@@ -1,2 +1,2 @@
 # FeedForge
-A simple creator of personal RSS Flux
+A custom RSS feed creator.
