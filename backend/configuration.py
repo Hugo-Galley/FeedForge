@@ -6,6 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from EasyWorkEnv import Config
 
+from models.Base import Base
+
 configuration = Config("variables.json")
 
 
@@ -25,12 +27,13 @@ def config_database():
     engine = create_engine(
         f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
     )
+    Base.metadata.create_all(bind=engine)
     session_local = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     db = session_local()
     return db
 
 def setup_logging():
-    os.makedirs("log", exist_ok=True)
+    os.makedirs(configuration.Log.FileDestination, exist_ok=True)
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 
@@ -63,3 +66,5 @@ def setup_logging():
 
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
+
+db = config_database()
