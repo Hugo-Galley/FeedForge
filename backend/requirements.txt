@@ -8,3 +8,4 @@ pymysql
 beautifulsoup4
 python-dateutil
 selenium
+cryptography
