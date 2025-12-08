@@ -231,3 +231,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+backend/variables.json
